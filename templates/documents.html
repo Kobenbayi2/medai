@@ -1,0 +1,17 @@
+<h2>Мои справки</h2>
+<a href="{% url 'certificate_request' %}" class="btn btn-primary">➕ Подать заявку</a>
+
+{% for c in certs %}
+  <div class="card">
+    <b>#{{ c.id }}</b> — {{ c.get_certificate_type_display }}<br>
+    Статус: <b>{{ c.get_status_display }}</b><br>
+
+    {% if c.pdf_file %}
+      <a href="{{ c.pdf_file.url }}" target="_blank">📄 Скачать PDF</a>
+    {% else %}
+      <span>PDF ещё не прикреплён врачом</span>
+    {% endif %}
+  </div>
+{% empty %}
+  <p>Заявок нет.</p>
+{% endfor %}

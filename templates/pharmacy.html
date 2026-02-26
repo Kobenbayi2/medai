@@ -1,0 +1,1257 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Аптека | MedAI{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Основные цвета */
+    :root {
+        --primary-color: #2d8f6d;
+        --primary-hover: #247158;
+        --border-radius: 10px;
+        --shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    }
+    
+    /* Карточки товаров с увеличенным фото */
+    .product-card {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 380px;
+        background: white;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    }
+    
+    .product-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 15px;
+    }
+    
+    .product-title {
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+        color: #2d3748;
+        line-height: 1.3;
+        height: 2.6em;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+    
+    .product-description {
+        flex: 1;
+        color: #718096;
+        font-size: 0.9rem;
+        line-height: 1.4;
+        margin-bottom: 12px;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        min-height: 2.8em;
+    }
+    
+    .product-price {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: var(--primary-color);
+        margin: 8px 0;
+    }
+    
+    .product-actions {
+        margin-top: auto;
+        display: flex;
+        gap: 8px;
+    }
+    
+    /* Увеличенные изображения товаров */
+    .product-image {
+        width: 100%;
+        height: 260px; /* Увеличил высоту для лучшей видимости */
+        overflow: hidden;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        padding: 20px; /* Добавил отступы для фото */
+    }
+    
+    .product-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain; /* Сохраняем пропорции */
+        object-position: center;
+        transition: transform 0.4s ease;
+        max-width: 100%;
+        max-height: 100%;
+        padding: 0; /* Убрал внутренние отступы */
+    }
+    
+    .product-card:hover .product-image img {
+        transform: scale(1.08);
+    }
+    
+    
+    /* Стили для модального окна товара */
+    .product-modal .modal-content {
+        max-width: 1000px;
+        width: 95%;
+        max-height: 80vh;
+        overflow-y: auto;
+        border-radius: var(--border-radius);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        background: white;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .product-modal .modal-body {
+        padding: 25px;
+        max-height: calc(80vh - 110px);
+        overflow-y: auto;
+    }
+    
+    .product-modal-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        align-items: start;
+    }
+    
+    .product-modal-image {
+        width: 100%;
+        height: 400px; /* Увеличил высоту для модального окна */
+        overflow: hidden;
+        border-radius: var(--border-radius);
+        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow);
+        border: 1px solid #e2e8f0;
+        padding: 30px; /* Добавил отступы */
+    }
+    
+    .product-modal-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        object-position: center;
+        max-width: 100%;
+        max-height: 100%;
+    }
+    
+    .product-modal-info {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .product-modal-info h3 {
+        font-size: 1.5rem;
+        margin: 0;
+        color: #2d3748;
+        line-height: 1.3;
+    }
+    
+    .product-modal-price {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: var(--primary-color);
+        margin: 10px 0;
+    }
+    
+    .product-modal-description {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: #4a5568;
+        padding: 15px;
+        background: #f7fafc;
+        border-radius: 8px;
+        border-left: 3px solid var(--primary-color);
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    
+    .product-modal-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+    }
+    
+    .product-modal-actions .btn-outline {
+        flex: 1;
+        padding: 12px;
+        font-size: 1rem;
+        border: 2px solid #e2e8f0;
+        color: #4a5568;
+    }
+    
+    .product-modal-actions .btn-primary {
+        flex: 2;
+        padding: 12px;
+        font-size: 1rem;
+        background: var(--primary-color);
+        border: none;
+    }
+    
+    .product-modal-actions .btn-primary:hover {
+        background: var(--primary-hover);
+    }
+    
+    /* Упрощенная корзина */
+    .cart-modal-content {
+        max-width: 600px;
+        width: 95%;
+        max-height: 75vh;
+        border-radius: var(--border-radius);
+        background: white;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .cart-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        background: #f7fafc;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        border-left: 3px solid var(--primary-color);
+        transition: all 0.2s ease;
+    }
+    
+    .cart-item:hover {
+        background: #edf2f7;
+    }
+    
+    .cart-item-info h4 {
+        margin: 0 0 5px 0;
+        color: #2d3748;
+        font-size: 1rem;
+        max-width: 300px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    .cart-item-info p {
+        margin: 0;
+        color: #4a5568;
+        font-size: 0.9rem;
+    }
+    
+    .cart-item-actions {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .cart-item-remove {
+        background: #fc8181;
+        color: white;
+        border: none;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        font-size: 0.8rem;
+        flex-shrink: 0;
+    }
+    
+    .cart-item-remove:hover {
+        background: #f56565;
+        transform: scale(1.1);
+    }
+    
+    .cart-item-total {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: var(--primary-color);
+        min-width: 80px;
+        text-align: right;
+        flex-shrink: 0;
+    }
+    
+    .cart-summary {
+        background: #f7fafc;
+        padding: 20px;
+        border-radius: var(--border-radius);
+        margin-top: 15px;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .cart-total-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 1.1rem;
+        color: #4a5568;
+    }
+    
+    .cart-total-row.total {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #2d3748;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 2px solid #e2e8f0;
+    }
+    
+    /* Упрощенное оформление заказа */
+    .order-modal-content {
+        max-width: 500px;
+        width: 95%;
+        max-height: 80vh;
+        border-radius: var(--border-radius);
+        background: white;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .order-form-container {
+        padding: 0 10px;
+    }
+    
+    .order-summary {
+        background: linear-gradient(135deg, var(--primary-color) 0%, #38a169 100%);
+        color: white;
+        padding: 20px;
+        border-radius: var(--border-radius);
+        margin-bottom: 20px;
+    }
+    
+    .order-summary h3 {
+        margin: 0 0 15px 0;
+        color: white;
+        font-size: 1.2rem;
+    }
+    
+    .order-summary-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        font-size: 1rem;
+    }
+    
+    .order-summary-item:last-child {
+        border-bottom: none;
+    }
+    
+    .order-summary-total {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-top: 10px;
+        padding-top: 12px;
+        border-top: 2px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .order-form-container h3 {
+        color: #2d3748;
+        margin: 25px 0 15px 0;
+        font-size: 1.2rem;
+    }
+    
+    .order-form-group {
+        margin-bottom: 20px;
+    }
+    
+    .order-form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #4a5568;
+        font-size: 1rem;
+    }
+    
+    .order-form-group input,
+    .order-form-group textarea {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+        color: #2d3748;
+    }
+    
+    .order-form-group input:focus,
+    .order-form-group textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(45, 143, 109, 0.1);
+    }
+    
+    /* Заголовки модальных окон */
+    .modal-header {
+        padding: 20px;
+        border-bottom: 1px solid #e2e8f0;
+        background: white;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .modal-header h2 {
+        margin: 0;
+        font-size: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #2d3748;
+    }
+    
+    .modal-header h2 i {
+        color: var(--primary-color);
+    }
+    
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 1.6rem;
+        cursor: pointer;
+        color: #718096;
+        transition: color 0.2s ease;
+        line-height: 1;
+        padding: 5px;
+    }
+    
+    .modal-close:hover {
+        color: #2d3748;
+    }
+    
+    .modal-footer {
+        padding: 20px;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        gap: 12px;
+        background: #f7fafc;
+        border-radius: 0 0 var(--border-radius) var(--border-radius);
+    }
+    
+    .modal-footer .btn-outline {
+        flex: 1;
+        border: 2px solid #e2e8f0;
+        color: #4a5568;
+        padding: 10px;
+    }
+    
+    .modal-footer .btn-primary {
+        flex: 2;
+        background: var(--primary-color);
+        border: none;
+        padding: 10px;
+    }
+    
+    .modal-footer .btn-primary:hover {
+        background: var(--primary-hover);
+    }
+    
+    /* Анимации */
+    @keyframes modalSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px) scale(0.98);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+    
+    .modal-content {
+        animation: modalSlideIn 0.3s ease-out;
+    }
+    
+    /* Адаптивные стили */
+    @media (max-width: 992px) {
+        .product-modal-content {
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+        
+        .product-modal-image {
+            height: 350px;
+        }
+        
+        .product-image {
+            height: 240px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .product-modal .modal-content {
+            width: 98%;
+            max-height: 85vh;
+            margin: 10px;
+        }
+        
+        .product-modal-image {
+            height: 300px;
+            padding: 20px;
+        }
+        
+        .product-image {
+            height: 200px;
+        }
+        
+        .modal-header {
+            padding: 15px;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .modal-footer {
+            padding: 15px;
+            flex-direction: column;
+        }
+        
+        .product-modal-actions {
+            flex-direction: column;
+        }
+        
+        .product-modal-price {
+            font-size: 1.6rem;
+        }
+        
+        .cart-modal-content,
+        .order-modal-content {
+            max-width: 95%;
+            margin: 10px;
+        }
+        
+        .product-card {
+            min-height: 380px;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .product-image {
+            height: 180px;
+        }
+        
+        .product-modal-image {
+            height: 250px;
+            padding: 15px;
+        }
+        
+        .product-modal .modal-content {
+            border-radius: 8px;
+        }
+        
+        .product-modal-info h3 {
+            font-size: 1.3rem;
+        }
+        
+        .product-card {
+            min-height: 350px;
+        }
+        
+        .product-title {
+            font-size: 1rem;
+        }
+        
+        .product-price {
+            font-size: 1.2rem;
+        }
+    }
+    
+    /* Стили для пустых состояний */
+    .empty-cart-message {
+        text-align: center;
+        padding: 40px 20px;
+    }
+    
+    .empty-cart-message i {
+        font-size: 2.5rem;
+        color: #cbd5e0;
+        margin-bottom: 15px;
+    }
+    
+    .empty-cart-message p {
+        font-size: 1.1rem;
+        color: #718096;
+        margin-bottom: 8px;
+    }
+    
+    .empty-cart-message small {
+        color: #a0aec0;
+    }
+    
+    /* Базовые стили для модальных окон */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal.active {
+        display: flex;
+    }
+    
+    
+    
+    /* Обрезка длинного текста */
+    .text-truncate-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    /* Стили для иконок без изображения */
+    .product-image .fas.fa-capsules {
+        font-size: 70px;
+        color: #2d8f6d;
+        opacity: 0.7;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Pharmacy Section -->
+<section class="pharmacy-section">
+    <div class="container">
+        <h1 class="page-title">Аптека MedAI</h1>
+        <div class="pharmacy-controls">
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Поиск лекарств...">
+                <button id="search-btn"><i class="fas fa-search"></i></button>
+            </div>
+            <div class="filter-container">
+                <select id="category-filter">
+                    <option value="">Все категории</option>
+                    <option value="pain">Обезболивающие</option>
+                    <option value="cold">От простуды</option>
+                    <option value="allergy">От аллергии</option>
+                    <option value="vitamins">Витамины</option>
+                    <option value="digestive">Для пищеварения</option>
+                    <option value="other">Другое</option>
+                </select>
+            </div>
+        </div>
+        <div class="products-grid" id="products-container">
+            {% if products %}
+                {% for product in products %}
+                <div class="product-card" data-id="{{ product.id }}" data-category="{{ product.category }}">
+                    <div class="product-image">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy"
+                                 data-full-image="{{ product.image.url }}">
+                        {% else %}
+                            <i class="fas fa-capsules"></i>
+                        {% endif %}
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title text-truncate-2">{{ product.name }}</h3>
+                        <p class="product-description text-truncate-2">
+                            {{ product.description|truncatechars:120 }}
+                        </p>
+                        <div class="product-price">{{ product.price }} ₸</div>
+                        <div class="product-actions">
+                            <button class="btn-outline view-details-btn" data-id="{{ product.id }}">Подробнее</button>
+                            <button class="btn-primary add-to-cart-btn" 
+                                    data-id="{{ product.id }}" 
+                                    data-name="{{ product.name }}" 
+                                    data-price="{{ product.price }}">
+                                В корзину
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-products">
+                    <i class="fas fa-box-open"></i>
+                    <p>Товары не найдены</p>
+                    <small>Попробуйте обновить страницу</small>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Модальное окно товара -->
+<div id="product-modal" class="modal product-modal">
+    <div class="modal-content">
+        <!-- Контент будет добавляться через JavaScript -->
+    </div>
+</div>
+
+<!-- Корзина -->
+<div class="modal" id="cart-modal">
+    <div class="modal-content cart-modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-shopping-cart"></i> Корзина</h2>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="cart-items" id="cart-items">
+                <div class="empty-cart-message">
+                    <i class="fas fa-shopping-cart"></i>
+                    <p>Ваша корзина пуста</p>
+                    <small>Добавьте товары из каталога</small>
+                </div>
+            </div>
+            <div class="cart-summary">
+                <div class="cart-total-row">
+                    <span>Стоимость товаров:</span>
+                    <span id="cart-subtotal">0 ₸</span>
+                </div>
+                <div class="cart-total-row total">
+                    <span>Итого:</span>
+                    <span id="cart-total-price">0 ₸</span>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-outline" id="continue-shopping">Продолжить покупки</button>
+            <button class="btn-primary" id="checkout-btn">Оформить заказ</button>
+        </div>
+    </div>
+</div>
+
+<!-- Упрощенное оформление заказа -->
+<div class="modal" id="order-modal">
+    <div class="modal-content order-modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-clipboard-check"></i> Оформление заказа</h2>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="order-form-container">
+                <div class="order-summary" id="order-summary">
+                    <!-- Сюда будет вставлена информация о заказе -->
+                </div>
+                
+                <h3>Ваши данные</h3>
+                <form id="order-form">
+                    <div class="order-form-group">
+                        <label for="customer-name">ФИО *</label>
+                        <input type="text" id="customer-name" name="name" required placeholder="Иванов Иван Иванович">
+                    </div>
+                    
+                    <div class="order-form-group">
+                        <label for="customer-phone">Телефон *</label>
+                        <input type="tel" id="customer-phone" name="phone" required placeholder="+7 (777) 123-45-67">
+                    </div>
+                    
+                    <div class="order-form-group">
+                        <label for="delivery-address">Адрес доставки *</label>
+                        <input type="text" id="delivery-address" name="address" required placeholder="Город, улица, дом, квартира">
+                    </div>
+                    
+                    <div class="order-form-group">
+                        <label for="order-comment">Комментарий к заказу (необязательно)</label>
+                        <textarea id="order-comment" name="comment" rows="2" placeholder="Дополнительные пожелания"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary" style="width: 100%; padding: 12px; margin-top: 10px;">
+                        <i class="fas fa-paper-plane"></i> Подтвердить заказ
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI Chat Widget -->
+<div class="chat-widget">
+    <div class="chat-header">
+        <span>ИИ-помощник MedAI</span>
+        <button class="chat-close"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="chat-messages">
+        <div class="message ai-message">
+            <div class="message-avatar">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div class="message-content">
+                <p>Здравствуйте! Я ИИ-помощник MedAI. Чем могу вам помочь?</p>
+            </div>
+        </div>
+    </div>
+    <div class="chat-input">
+        <input type="text" placeholder="Введите ваш вопрос...">
+        <button class="send-btn"><i class="fas fa-paper-plane"></i></button>
+    </div>
+</div>
+<div class="chat-toggle">
+    <i class="fas fa-comment-medical"></i>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Инициализация корзины
+    let cart = JSON.parse(localStorage.getItem('medai_cart')) || [];
+    
+    // Обновление счетчика корзины
+    function updateCartCount() {
+        const count = cart.reduce((total, item) => total + item.quantity, 0);
+        const cartCountElement = document.getElementById('cart-count');
+        if (cartCountElement) {
+            cartCountElement.textContent = count;
+        }
+    }
+    
+    // Функция для добавления в корзину
+    function addToCart(productId, productName, price, quantity = 1) {
+        const existingItem = cart.find(item => item.id === productId);
+        
+        if (existingItem) {
+            existingItem.quantity += quantity;
+        } else {
+            cart.push({
+                id: productId,
+                name: productName,
+                price: price,
+                quantity: quantity
+            });
+        }
+        
+        localStorage.setItem('medai_cart', JSON.stringify(cart));
+        updateCartCount();
+        showNotification(`${productName} добавлен в корзину!`);
+    }
+    
+    // Функция для показа уведомления
+    function showNotification(message) {
+        const notification = document.createElement('div');
+        notification.className = 'notification';
+        notification.innerHTML = `
+            <div class="notification-content">
+                <i class="fas fa-check-circle"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #2d8f6d 0%, #38a169 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 9999;
+            animation: slideInRight 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease-out forwards';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+    
+    // Функция для открытия модального окна товара
+    function openProductModal(productId) {
+        const productCard = document.querySelector(`.product-card[data-id="${productId}"]`);
+        if (!productCard) return;
+        
+        const productName = productCard.querySelector('.product-title').textContent;
+        const productDescription = productCard.querySelector('.product-description').textContent;
+        const productPrice = productCard.querySelector('.product-price').textContent;
+        const productImage = productCard.querySelector('.product-image img');
+        const productImageSrc = productImage ? productImage.dataset.fullImage || productImage.src : '';
+        
+        const modal = document.getElementById('product-modal');
+        const modalContent = modal.querySelector('.modal-content');
+        
+        // Упрощенное содержимое модального окна
+        modalContent.innerHTML = `
+            <div class="modal-header">
+                <h2><i class="fas fa-capsules"></i> ${productName}</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="product-modal-content">
+                    <div class="product-modal-image">
+                        ${productImageSrc ? 
+                            `<img src="${productImageSrc}" alt="${productName}" loading="lazy">` : 
+                            `<i class="fas fa-capsules" style="font-size: 100px; color: #2d8f6d; opacity: 0.7;"></i>`
+                        }
+                    </div>
+                    <div class="product-modal-info">
+                        <div>
+                            <h3>${productName}</h3>
+                            <div class="product-modal-price">${productPrice}</div>
+                        </div>
+                        
+                        <div class="product-modal-description">
+                            ${productDescription}
+                        </div>
+                        
+                        <div class="product-modal-actions">
+                            <button class="btn-outline" id="close-product-modal">
+                                <i class="fas fa-times"></i> Закрыть
+                            </button>
+                            <button class="btn-primary add-to-cart-modal-btn" 
+                                    data-id="${productId}" 
+                                    data-name="${productName}" 
+                                    data-price="${productPrice.replace(' ₸', '')}">
+                                <i class="fas fa-shopping-cart"></i> Добавить в корзину
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Показываем модальное окно
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        
+        // Закрытие модального окна
+        function closeModal() {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Добавляем обработчики закрытия
+        modalContent.querySelector('.modal-close').addEventListener('click', closeModal);
+        modalContent.querySelector('#close-product-modal').addEventListener('click', closeModal);
+        
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) closeModal();
+        });
+        
+        // Добавление в корзину из модального окна
+        const addToCartBtn = modalContent.querySelector('.add-to-cart-modal-btn');
+        if (addToCartBtn) {
+            addToCartBtn.addEventListener('click', function() {
+                const productId = this.dataset.id;
+                const productName = this.dataset.name;
+                const price = parseFloat(this.dataset.price);
+                addToCart(productId, productName, price);
+                closeModal();
+            });
+        }
+    }
+    
+    // Инициализация при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCartCount();
+        
+        // Открытие корзины
+        const cartIcon = document.getElementById('cart-icon');
+        if (cartIcon) {
+            cartIcon.addEventListener('click', function() {
+                openCartModal();
+            });
+        }
+        
+        // Добавляем обработчики событий для кнопок корзины
+        document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const productId = this.dataset.id;
+                const productName = this.dataset.name;
+                const price = parseFloat(this.dataset.price);
+                addToCart(productId, productName, price);
+            });
+        });
+        
+        // Добавляем обработчики для кнопок "Подробнее"
+        document.querySelectorAll('.view-details-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const productId = this.dataset.id;
+                openProductModal(productId);
+            });
+        });
+        
+        // Инициализация поиска и фильтрации
+        setupSearchAndFilter();
+        
+        // Оформление заказа
+        document.getElementById('checkout-btn')?.addEventListener('click', function() {
+            openOrderModal();
+        });
+        
+        // Отправка формы заказа
+        document.getElementById('order-form')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            submitOrder();
+        });
+        
+        // Добавляем обработчики для всех модальных окон
+        document.querySelectorAll('.modal-close').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const modal = this.closest('.modal');
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            });
+        });
+        
+        // Закрытие модальных окон при клике вне контента
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            });
+        });
+    });
+    
+    // Функции для поиска и фильтрации
+    function setupSearchAndFilter() {
+        const searchBtn = document.getElementById('search-btn');
+        const searchInput = document.getElementById('search-input');
+        const categoryFilter = document.getElementById('category-filter');
+        
+        if (searchBtn) {
+            searchBtn.addEventListener('click', filterProducts);
+        }
+        
+        if (searchInput) {
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    filterProducts();
+                }
+            });
+        }
+        
+        if (categoryFilter) {
+            categoryFilter.addEventListener('change', filterProducts);
+        }
+    }
+    
+    function filterProducts() {
+        const searchTerm = document.getElementById('search-input').value.toLowerCase();
+        const selectedCategory = document.getElementById('category-filter').value;
+        const productCards = document.querySelectorAll('.product-card');
+        
+        productCards.forEach(card => {
+            const productName = card.querySelector('.product-title').textContent.toLowerCase();
+            const productDesc = card.querySelector('.product-description').textContent.toLowerCase();
+            const productCategory = card.dataset.category;
+            
+            let showCard = true;
+            
+            if (searchTerm && !productName.includes(searchTerm) && !productDesc.includes(searchTerm)) {
+                showCard = false;
+            }
+            
+            if (selectedCategory && productCategory !== selectedCategory) {
+                showCard = false;
+            }
+            
+            card.style.display = showCard ? 'block' : 'none';
+        });
+        
+        const visibleCards = Array.from(productCards).filter(card => card.style.display !== 'none');
+        const productsContainer = document.getElementById('products-container');
+        
+        if (visibleCards.length === 0) {
+            if (!document.querySelector('.no-products')) {
+                const noProductsDiv = document.createElement('div');
+                noProductsDiv.className = 'no-products';
+                noProductsDiv.innerHTML = `
+                    <i class="fas fa-search"></i>
+                    <p>Товары не найдены</p>
+                    <small>Попробуйте изменить критерии поиска</small>
+                `;
+                productsContainer.appendChild(noProductsDiv);
+            }
+        } else {
+            const noProductsDiv = document.querySelector('.no-products');
+            if (noProductsDiv) {
+                noProductsDiv.remove();
+            }
+        }
+    }
+    
+    // Функция для открытия корзины
+    function openCartModal() {
+        const cartModal = document.getElementById('cart-modal');
+        const cartItems = document.getElementById('cart-items');
+        
+        if (cart.length === 0) {
+            cartItems.innerHTML = `
+                <div class="empty-cart-message">
+                    <i class="fas fa-shopping-cart"></i>
+                    <p>Ваша корзина пуста</p>
+                    <small>Добавьте товары из каталога</small>
+                </div>
+            `;
+        } else {
+            let itemsHtml = '';
+            let subtotal = 0;
+            
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+                
+                itemsHtml += `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <h4 class="text-truncate-2">${item.name}</h4>
+                            <p>${item.price} ₸ × ${item.quantity}</p>
+                        </div>
+                        <div class="cart-item-actions">
+                            <button class="cart-item-remove" data-id="${item.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <span class="cart-item-total">${itemTotal} ₸</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            cartItems.innerHTML = itemsHtml;
+            document.getElementById('cart-subtotal').textContent = subtotal + ' ₸';
+            document.getElementById('cart-total-price').textContent = subtotal + ' ₸';
+            
+            document.querySelectorAll('.cart-item-remove').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const itemId = this.dataset.id;
+                    removeFromCart(itemId);
+                    openCartModal();
+                });
+            });
+        }
+        
+        cartModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        
+        document.getElementById('continue-shopping').addEventListener('click', function() {
+            cartModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+    }
+    
+    // Функция для удаления из корзины
+    function removeFromCart(productId) {
+        cart = cart.filter(item => item.id != productId);
+        localStorage.setItem('medai_cart', JSON.stringify(cart));
+        updateCartCount();
+        showNotification('Товар удален из корзины');
+    }
+    
+    // Функция для открытия формы заказа
+    function openOrderModal() {
+        if (cart.length === 0) {
+            alert('Ваша корзина пуста. Добавьте товары перед оформлением заказа.');
+            return;
+        }
+        
+        const orderModal = document.getElementById('order-modal');
+        const orderSummary = document.getElementById('order-summary');
+        
+        let summaryHtml = '<h3>Ваш заказ:</h3>';
+        let subtotal = 0;
+        
+        cart.forEach(item => {
+            const itemTotal = item.price * item.quantity;
+            subtotal += itemTotal;
+            
+            summaryHtml += `
+                <div class="order-summary-item">
+                    <span class="text-truncate-2">${item.name} × ${item.quantity}</span>
+                    <span>${itemTotal} ₸</span>
+                </div>
+            `;
+        });
+        
+        summaryHtml += `
+            <div class="order-summary-item order-summary-total">
+                <span>Итого:</span>
+                <span>${subtotal} ₸</span>
+            </div>
+        `;
+        
+        orderSummary.innerHTML = summaryHtml;
+        
+        const savedData = JSON.parse(localStorage.getItem('medai_customer_data')) || {};
+        
+        document.getElementById('customer-name').value = savedData.name || '';
+        document.getElementById('customer-phone').value = savedData.phone || '';
+        document.getElementById('delivery-address').value = savedData.address || '';
+        
+        orderModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        
+        // Закрываем корзину
+        document.getElementById('cart-modal').style.display = 'none';
+    }
+    
+    // Функция для отправки заказа
+    function submitOrder() {
+        const form = document.getElementById('order-form');
+        const formData = new FormData(form);
+        
+        const customerData = {
+            name: formData.get('name'),
+            phone: formData.get('phone'),
+            address: formData.get('address'),
+            comment: formData.get('comment')
+        };
+        
+        localStorage.setItem('medai_customer_data', JSON.stringify(customerData));
+        
+        const orderData = {
+            customer: customerData,
+            cart: cart,
+            total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+            order_date: new Date().toISOString(),
+            order_id: 'MED' + Date.now()
+        };
+        
+        // Сохраняем заказ в localStorage
+        const orders = JSON.parse(localStorage.getItem('medai_orders')) || [];
+        orders.push(orderData);
+        localStorage.setItem('medai_orders', JSON.stringify(orders));
+        
+        // Очищаем корзину
+        cart = [];
+        localStorage.removeItem('medai_cart');
+        updateCartCount();
+        
+        // Закрываем модальные окна
+        document.getElementById('cart-modal').style.display = 'none';
+        document.getElementById('order-modal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+        
+        // Показываем подтверждение
+        alert(`✅ Заказ №${orderData.order_id} успешно оформлен!\n\n📞 Мы свяжемся с вами по телефону: ${customerData.phone}\n\n💰 Сумма заказа: ${orderData.total} ₸\n\nСпасибо за покупку в MedAI!`);
+        
+        showNotification('✅ Заказ успешно оформлен!');
+    }
+</script>
+{% endblock %}

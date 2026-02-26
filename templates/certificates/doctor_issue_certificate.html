@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+  .issue-page{
+    max-width: 900px;
+    margin: 28px auto;
+    padding: 0 16px;
+  }
+
+  .issue-header{
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:14px;
+    align-items:flex-start;
+    margin-bottom: 14px;
+  }
+
+  .issue-title{
+    margin:0;
+    font-size: 28px;
+    font-weight: 900;
+  }
+
+  .issue-sub{
+    margin:6px 0 0;
+    font-size:14px;
+    color:#6b7280;
+  }
+
+  .issue-panel{
+    background: rgba(255,255,255,.88);
+    border: 1px solid rgba(0,0,0,.08);
+    border-radius: 18px;
+    box-shadow: 0 14px 40px rgba(0,0,0,.08);
+    padding: 18px;
+  }
+
+  .issue-card{
+    background:#fff;
+    border:1px solid rgba(0,0,0,.08);
+    border-radius:16px;
+    padding:16px;
+    box-shadow:0 10px 26px rgba(0,0,0,.06);
+  }
+
+  .issue-field{
+    margin-bottom:14px;
+  }
+
+  .issue-field label{
+    display:block;
+    font-weight:900;
+    margin-bottom:6px;
+    font-size:13px;
+  }
+
+  select, textarea, input{
+    width:100%;
+    padding:10px 12px;
+    border-radius:12px;
+    border:1px solid rgba(0,0,0,.14);
+    outline:none;
+    transition:.2s;
+  }
+
+  select:focus, textarea:focus, input:focus{
+    border-color:#14b8a6;
+    box-shadow:0 0 0 4px rgba(20,184,166,.15);
+  }
+
+  textarea{
+    min-height:120px;
+    resize:vertical;
+  }
+
+  .issue-actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:10px;
+  }
+
+  .issue-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 14px;
+    border-radius:12px;
+    border:1px solid rgba(0,0,0,.10);
+    background:#fff;
+    font-weight:900;
+    cursor:pointer;
+    text-decoration:none;
+    transition:.15s;
+  }
+
+  .issue-btn:hover{
+    transform:translateY(-1px);
+    box-shadow:0 10px 22px rgba(0,0,0,.10);
+  }
+
+  .issue-btn.primary{
+    background:linear-gradient(135deg,#14b8a6,#22c55e);
+    color:#052018;
+    border-color:rgba(34,197,94,.35);
+  }
+
+  .issue-btn.secondary{
+    background:#f3f4f6;
+  }
+
+  .issue-info{
+    background:rgba(20,184,166,.08);
+    border:1px solid rgba(20,184,166,.25);
+    padding:12px 14px;
+    border-radius:14px;
+    margin-bottom:14px;
+    font-size:14px;
+  }
+
+  .issue-file{
+    font-size:13px;
+    margin-top:8px;
+    color:#374151;
+  }
+
+  .issue-file a{
+    font-weight:700;
+    color:#14b8a6;
+    text-decoration:none;
+  }
+
+</style>
+
+<div class="issue-page">
+
+  <div class="issue-header">
+    <div>
+      <h1 class="issue-title">Справка #{{ cert.id }}</h1>
+      <p class="issue-sub">
+        Пациент: <b>{{ cert.patient.username }}</b>
+      </p>
+    </div>
+
+    <a href="{% url 'doctor_certificates' %}" class="issue-btn secondary">
+      ← Назад
+    </a>
+  </div>
+
+  <div class="issue-panel">
+
+    <div class="issue-info">
+      ℹ️ После изменения статуса на <b>«Выдано»</b> и прикрепления PDF,
+      пациент сможет скачать документ в личном кабинете.
+    </div>
+
+    <div class="issue-card">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="issue-field">
+          <label>Статус</label>
+          {{ form.status }}
+        </div>
+
+        <div class="issue-field">
+          <label>Комментарий врача</label>
+          {{ form.doctor_comment }}
+        </div>
+
+        <div class="issue-field">
+          <label>PDF файл справки</label>
+          {{ form.pdf_file }}
+
+          {% if cert.pdf_file %}
+            <div class="issue-file">
+              Текущий файл:
+              <a href="{{ cert.pdf_file.url }}" target="_blank">Открыть PDF</a>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="issue-actions">
+          <button class="issue-btn primary" type="submit">
+            💾 Сохранить изменения
+          </button>
+          <a href="{% url 'doctor_certificates' %}" class="issue-btn secondary">
+            Отмена
+          </a>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}

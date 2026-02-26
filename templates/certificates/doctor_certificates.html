@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+  /* Только для этой страницы */
+  .doc-page{
+    max-width: 1040px;
+    margin: 28px auto;
+    padding: 0 16px;
+  }
+  .doc-header{
+    display:flex;
+    justify-content:space-between;
+    gap:14px;
+    flex-wrap:wrap;
+    align-items:flex-start;
+    margin-bottom: 14px;
+  }
+  .doc-title{
+    margin:0;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: .2px;
+  }
+  .doc-subtitle{
+    margin: 6px 0 0;
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.5;
+    max-width: 700px;
+  }
+
+  .doc-panel{
+    background: rgba(255,255,255,.86);
+    border: 1px solid rgba(0,0,0,.08);
+    border-radius: 18px;
+    box-shadow: 0 14px 40px rgba(0,0,0,.08);
+    padding: 16px;
+    backdrop-filter: blur(8px);
+  }
+
+  .doc-grid{
+    display:grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  @media (min-width: 900px){
+    .doc-grid{ grid-template-columns: 1fr 1fr; }
+  }
+
+  .doc-card{
+    background:#fff;
+    border: 1px solid rgba(0,0,0,.08);
+    border-radius: 16px;
+    padding: 14px;
+    box-shadow: 0 10px 26px rgba(0,0,0,.06);
+  }
+  .doc-top{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .doc-name{
+    margin:0;
+    font-weight: 900;
+    color:#0f172a;
+    font-size: 16px;
+  }
+  .doc-meta{
+    margin-top: 6px;
+    color:#6b7280;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .doc-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    border: 1px solid rgba(0,0,0,.08);
+    background: rgba(0,0,0,.03);
+    color:#111827;
+    white-space: nowrap;
+  }
+  .doc-badge.success{ border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.12); }
+  .doc-badge.info{ border-color: rgba(20,184,166,.35); background: rgba(20,184,166,.12); }
+  .doc-badge.warn{ border-color: rgba(245,158,11,.35); background: rgba(245,158,11,.12); }
+  .doc-badge.danger{ border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.12); }
+
+  .doc-divider{
+    height:1px;
+    background: rgba(0,0,0,.08);
+    margin: 12px 0;
+  }
+
+  .doc-actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:space-between;
+  }
+
+  .doc-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,.10);
+    background: #ffffff;
+    text-decoration:none;
+    color:#111827;
+    font-weight: 900;
+    box-shadow: 0 8px 22px rgba(0,0,0,.06);
+    transition: transform .08s ease, box-shadow .15s ease, background .15s ease;
+    cursor:pointer;
+  }
+  .doc-btn:hover{
+    transform: translateY(-1px);
+    box-shadow: 0 12px 26px rgba(0,0,0,.10);
+  }
+  .doc-btn.primary{
+    background: linear-gradient(135deg, #14b8a6, #22c55e);
+    border-color: rgba(34,197,94,.35);
+    color: #052018;
+  }
+  .doc-btn.danger{
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    border-color: rgba(239,68,68,.35);
+    color: white;
+  }
+
+  .doc-empty{
+    text-align:center;
+    color:#6b7280;
+    padding: 22px;
+    border: 1px dashed rgba(0,0,0,.18);
+    border-radius: 16px;
+    background: rgba(255,255,255,.6);
+  }
+
+  .doc-hint{
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(20,184,166,.25);
+    background: rgba(20,184,166,.08);
+    color:#0f172a;
+    margin-bottom: 14px;
+  }
+  .doc-hint b{ font-weight: 900; }
+</style>
+
+<div class="doc-page">
+
+  <div class="doc-header">
+    <div>
+      <h1 class="doc-title">Заявки на справки</h1>
+      <p class="doc-subtitle">
+        Здесь отображаются заявки пациентов. Откройте заявку, укажите статус, добавьте комментарий и прикрепите PDF.
+      </p>
+    </div>
+
+    <a href="{% url 'index' %}" class="doc-btn">🏠 На главную</a>
+  </div>
+
+  <div class="doc-panel">
+
+    <div class="doc-hint">
+      <div style="font-size:18px; line-height:1;">ℹ️</div>
+      <div>
+        <b>Подсказка:</b> Чтобы выдать справку — откройте заявку и прикрепите PDF-файл. После статуса <b>“Выдано”</b> пациент сможет скачать документ.
+      </div>
+    </div>
+
+    <div class="doc-grid">
+      {% for c in certs %}
+        <div class="doc-card">
+
+          <div class="doc-top">
+            <div>
+              <p class="doc-name">#{{ c.id }} — {{ c.get_certificate_type_display }}</p>
+              <div class="doc-meta">
+                Пациент: <b>{{ c.patient.username }}</b><br>
+                Создано: {{ c.created_at|date:"d.m.Y H:i" }}
+              </div>
+            </div>
+
+            {% if c.status == 'issued' %}
+              <span class="doc-badge success">✅ Выдано</span>
+            {% elif c.status == 'review' %}
+              <span class="doc-badge info">🔎 На рассмотрении</span>
+            {% elif c.status == 'rejected' %}
+              <span class="doc-badge danger">⛔ Отказано</span>
+            {% else %}
+              <span class="doc-badge warn">🆕 Новая</span>
+            {% endif %}
+          </div>
+
+          <div class="doc-divider"></div>
+
+          <div class="doc-actions">
+            <div class="doc-meta" style="margin:0;">
+              Статус: <b>{{ c.get_status_display }}</b>
+            </div>
+
+            <div style="display: flex; gap: 8px;">
+              <a class="doc-btn primary" href="{% url 'doctor_issue_certificate' c.id %}">
+                📝 Открыть / Выдать
+              </a>
+              
+              <!-- Кнопка удаления с подтверждением -->
+              <form method="POST" action="{% url 'delete_certificate' c.id %}" style="display: inline;" onsubmit="return confirm('Вы уверены, что хотите удалить эту заявку? Это действие нельзя отменить.');">
+                {% csrf_token %}
+                <button type="submit" class="doc-btn danger">
+                  🗑️ Удалить
+                </button>
+              </form>
+            </div>
+          </div>
+
+        </div>
+      {% empty %}
+        <div class="doc-empty">
+          Заявок пока нет.<br>
+          Когда пациент создаст заявку, она появится здесь.
+        </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

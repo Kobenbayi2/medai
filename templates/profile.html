@@ -1,0 +1,742 @@
+{% extends 'base.html' %}
+
+{% block title %}Профиль — MedAI{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Общие стили профиля */
+.profile-page {
+    padding: 40px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Хедер профиля */
+.profile-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 20px;
+    padding: 40px;
+    color: white;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: translate(30%, -30%);
+}
+
+.profile-header-content {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    position: relative;
+    z-index: 1;
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    color: var(--primary-color);
+    font-weight: bold;
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.profile-info h1 {
+    margin: 0 0 10px;
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.profile-info p {
+    margin: 5px 0;
+    opacity: 0.9;
+    font-size: 16px;
+}
+
+.profile-stats {
+    display: flex;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.stat-item {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 15px 25px;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: bold;
+    display: block;
+}
+
+.stat-label {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+/* Основной контент профиля */
+.profile-content {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 30px;
+}
+
+/* Левая колонка - Основная информация */
+.main-info-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    margin-bottom: 30px;
+}
+
+.card-title {
+    font-size: 22px;
+    color: var(--primary-dark);
+    margin: 0 0 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--light-bg);
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.info-label {
+    font-size: 14px;
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.info-value {
+    font-size: 16px;
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+/* История консультаций */
+.consultations-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.consultation-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.consultation-item {
+    background: var(--light-bg);
+    border-radius: 15px;
+    padding: 20px;
+    border-left: 5px solid var(--primary-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.consultation-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.consultation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.consultation-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.consultation-status {
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-completed {
+    background: #e7f7ef;
+    color: #2e7d32;
+}
+
+.status-pending {
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.status-cancelled {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.consultation-details {
+    font-size: 14px;
+    color: var(--text-light);
+}
+
+.consultation-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+/* Правая колонка - Боковая панель */
+.sidebar-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    margin-bottom: 30px;
+}
+
+.sidebar-title {
+    font-size: 20px;
+    color: var(--primary-dark);
+    margin: 0 0 20px;
+}
+
+.quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.quick-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: var(--light-bg);
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--text-dark);
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+    text-align: left;
+}
+
+.quick-action-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: translateX(5px);
+}
+
+.quick-action-btn i {
+    font-size: 20px;
+    width: 24px;
+}
+
+
+/* Настройки безопасности */
+.security-settings {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.security-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: var(--light-bg);
+    border-radius: 12px;
+}
+
+.security-info h4 {
+    margin: 0 0 5px;
+    font-size: 16px;
+}
+
+.security-info p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-light);
+}
+
+.security-actions .btn-small {
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+/* Адаптивность */
+@media (max-width: 992px) {
+    .profile-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .profile-header-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .profile-stats {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+    .profile-header {
+        padding: 30px 20px;
+    }
+    
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        font-size: 36px;
+    }
+    
+    .profile-info h1 {
+        font-size: 24px;
+    }
+    
+    .main-info-card,
+    .consultations-card,
+    .sidebar-card {
+        padding: 20px;
+    }
+    
+    .consultation-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}
+
+/* Анимации */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.profile-card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Элементы интерфейса */
+.btn-small {
+    padding: 8px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary-small {
+    background: var(--primary-gradient);
+    color: white;
+}
+
+.btn-primary-small:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 150, 136, 0.3);
+}
+
+.btn-secondary-small {
+    background: transparent;
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+}
+
+.btn-secondary-small:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Пустое состояние */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.empty-state i {
+    font-size: 48px;
+    color: var(--light-gray);
+    margin-bottom: 20px;
+}
+
+.empty-state h3 {
+    color: var(--text-light);
+    margin-bottom: 10px;
+}
+
+.btn-primary {
+    display: inline-block;
+    padding: 12px 30px;
+    background: var(--primary-gradient);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0, 150, 136, 0.4);
+}
+
+.badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge-admin {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.badge-staff {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
+.badge-user {
+    background: #e8f5e8;
+    color: #2e7d32;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+    <!-- Хедер профиля -->
+    <div class="profile-header">
+        <div class="profile-header-content">
+            <div class="profile-avatar">
+                {% if user.first_name or user.last_name %}
+                    {{ user.first_name|slice:":1" }}{{ user.last_name|slice:":1" }}
+                {% else %}
+                    {{ user.username|slice:":1"|upper }}
+                {% endif %}
+            </div>
+            <div class="profile-info">
+                <h1>{{ user.get_full_name|default:user.username }}</h1>
+                <p><i class="fas fa-envelope"></i> {{ user.email }}</p>
+                <p><i class="fas fa-calendar-alt"></i> Зарегистрирован: {{ user.date_joined|date:"d.m.Y" }}</p>
+                
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <span class="stat-value">{{ consultation_count|default:"0" }}</span>
+                        <span class="stat-label">Консультаций</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">{{ active_consultations|default:"0" }}</span>
+                        <span class="stat-label">Активных</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Статус</span>
+                        <span class="stat-value">{% if user.is_active %}Активен{% else %}Не активен{% endif %}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Основной контент -->
+    <div class="profile-content">
+        <!-- Левая колонка -->
+        <div class="profile-main">
+            <!-- Основная информация -->
+            <div class="main-info-card">
+                <h2 class="card-title"><i class="fas fa-user-circle"></i> Личная информация</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Имя пользователя</span>
+                        <span class="info-value">{{ user.username }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Email</span>
+                        <span class="info-value">{{ user.email }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Имя</span>
+                        <span class="info-value">{{ user.first_name|default:"Не указано" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Фамилия</span>
+                        <span class="info-value">{{ user.last_name|default:"Не указана" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Роль</span>
+                        <span class="info-value">
+                            {% if user.is_superuser %}
+                                <span class="badge badge-admin">Администратор</span>
+                            {% elif user.is_staff %}
+                                <span class="badge badge-staff">Персонал</span>
+                            {% else %}
+                                <span class="badge badge-user">Пользователь</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Последний вход</span>
+                        <span class="info-value">{{ user.last_login|date:"d.m.Y H:i"|default:"Нет данных" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- История консультаций -->
+            <div class="consultations-card">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                    <h2 class="card-title"><i class="fas fa-history"></i> История консультаций</h2>
+                    <a href="{% url 'book_consultation' %}" class="btn-primary-small">
+                        <i class="fas fa-plus"></i> Новая запись
+                    </a>
+                </div>
+                
+                {% if user_consultations %}
+                    <div class="consultation-list">
+                        {% for c in user_consultations %}
+                            <div class="consultation-item">
+                                <div class="consultation-header">
+                                    <h3 class="consultation-title">{{ c.patient_name }}</h3>
+                                    <span class="consultation-status status-{{ c.status }}">
+                                        {{ c.get_status_display }}
+                                    </span>
+                                </div>
+                                <div class="consultation-details">
+                                    <p><i class="fas fa-calendar"></i> {{ c.appointment_date }} {{ c.appointment_time }}</p>
+                                    <p><i class="fas fa-stethoscope"></i> {{ c.specialization|default:"Общая консультация" }}</p>
+                                    {% if c.notes %}
+                                        <p><i class="fas fa-comment"></i> {{ c.notes|truncatechars:100 }}</p>
+                                    {% endif %}
+                                </div>
+                                <div class="consultation-actions">
+                                    <button class="btn-primary-small btn-sm">
+                                        <i class="fas fa-eye"></i> Подробнее
+                                    </button>
+                                    {% if c.status == 'pending' %}
+                                        <button class="btn-secondary-small btn-sm">
+                                            <i class="fas fa-calendar-times"></i> Отменить
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-times"></i>
+                        <h3>Пока нет консультаций</h3>
+                        <p>Запишитесь на первую консультацию</p>
+                        <a href="{% url 'book_consultation' %}" class="btn-primary" style="margin-top: 20px;">
+                            Записаться на консультацию
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Правая колонка - Боковая панель -->
+        <div class="profile-sidebar">
+            <!-- Быстрые действия -->
+            <div class="sidebar-card">
+                <h3 class="sidebar-title"><i class="fas fa-bolt"></i> Быстрые действия</h3>
+                <div class="quick-actions">
+                    <!-- КНОПКА ДЛЯ ПЕРЕХОДА НА СТРАНИЦУ СЕРТИФИКАТОВ ВРАЧЕЙ (В САМОМ НАЧАЛЕ) -->
+                    <a href="http://127.0.0.1:8000/doctor/certificates/" class="quick-action-btn certificate-btn">
+                        <i class="fas fa-certificate"></i>
+                        <span style="font-weight: bold;">👨‍⚕️ Сертификаты врачей</span>
+                        <i class="fas fa-arrow-right" style="margin-left: auto;"></i>
+                    </a>
+                    
+                    <a href="{% url 'book_consultation' %}" class="quick-action-btn">
+                        <i class="fas fa-calendar-plus"></i>
+                        <span>Записаться на консультацию</span>
+                    </a>
+                    <a href="{% url 'index' %}" class="quick-action-btn">
+                        <i class="fas fa-home"></i>
+                        <span>На главную</span>
+                    </a>
+                    <a href="#" class="quick-action-btn">
+                        <i class="fas fa-pills"></i>
+                        <span>Мои лекарства</span>
+                    </a>
+                    <a href="#" class="quick-action-btn">
+                        <i class="fas fa-file-medical"></i>
+                        <span>Медицинские документы</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Настройки безопасности -->
+            <div class="sidebar-card">
+                <h3 class="sidebar-title"><i class="fas fa-shield-alt"></i> Безопасность</h3>
+                <div class="security-settings">
+                    <div class="security-item">
+                        <div class="security-info">
+                            <h4>Пароль</h4>
+                            <p>Последнее изменение: 2 месяца назад</p>
+                        </div>
+                        <div class="security-actions">
+                            <button class="btn-secondary-small">Изменить</button>
+                        </div>
+                    </div>
+                    <div class="security-item">
+                        <div class="security-info">
+                            <h4>Двухфакторная аутентификация</h4>
+                            <p>Не подключена</p>
+                        </div>
+                        <div class="security-actions">
+                            <button class="btn-secondary-small">Подключить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Управление аккаунтом -->
+            <div class="sidebar-card">
+                <h3 class="sidebar-title"><i class="fas fa-cog"></i> Управление</h3>
+                <div class="quick-actions">
+                    <form method="post" action="{% url 'logout' %}" style="width: 100%;">
+                        {% csrf_token %}
+                        <button type="submit" class="quick-action-btn" style="background: #ffebee; color: #c62828; width: 100%;">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Выйти из аккаунта</span>
+                        </button>
+                    </form>
+                    <a href="#" class="quick-action-btn" style="background: #fff3e0; color: #f57c00;">
+                        <i class="fas fa-trash-alt"></i>
+                        <span>Удалить аккаунт</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Анимация появления карточек
+    const cards = document.querySelectorAll('.profile-card, .main-info-card, .consultations-card, .sidebar-card');
+    cards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+    });
+    
+    // Подтверждение выхода
+    const logoutForm = document.querySelector('form[action*="logout"]');
+    if (logoutForm) {
+        logoutForm.addEventListener('submit', function(e) {
+            if (!confirm('Вы уверены, что хотите выйти?')) {
+                e.preventDefault();
+            }
+        });
+    }
+    
+    // Инициализация интерактивных элементов
+    initProfileInteractions();
+    
+    // Подсветка активной кнопки в меню
+    const currentUrl = window.location.pathname;
+    const quickActionBtns = document.querySelectorAll('.quick-action-btn');
+    
+    quickActionBtns.forEach(btn => {
+        if (btn.getAttribute('href') === currentUrl) {
+            btn.style.background = 'var(--primary-color)';
+            btn.style.color = 'white';
+        }
+    });
+
+    // Специальное выделение для кнопки сертификатов при наведении
+    const certificateBtn = document.querySelector('.certificate-btn');
+    if (certificateBtn) {
+        certificateBtn.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateX(5px) scale(1.02)';
+        });
+        certificateBtn.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateX(0) scale(1)';
+        });
+    }
+});
+
+function initProfileInteractions() {
+    // Переключение видимости конфиденциальной информации
+    const sensitiveInfo = document.querySelectorAll('.info-value');
+    sensitiveInfo.forEach(info => {
+        info.addEventListener('click', function() {
+            if (this.classList.contains('sensitive')) {
+                this.classList.toggle('masked');
+                if (this.classList.contains('masked')) {
+                    this.dataset.original = this.textContent;
+                    this.textContent = '••••••••';
+                } else {
+                    this.textContent = this.dataset.original;
+                }
+            }
+        });
+    });
+    
+    // Подсветка активных элементов
+    const quickActions = document.querySelectorAll('.quick-action-btn');
+    quickActions.forEach(btn => {
+        btn.addEventListener('mouseenter', function() {
+            if (!this.classList.contains('active') && !this.classList.contains('certificate-btn')) {
+                this.style.transform = 'translateX(5px)';
+            }
+        });
+        
+        btn.addEventListener('mouseleave', function() {
+            if (!this.classList.contains('active') && !this.classList.contains('certificate-btn')) {
+                this.style.transform = 'translateX(0)';
+            }
+        });
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,202 @@
+[
+    {
+        "id": 1,
+        "name": "Парацетамол",
+        "price": 800,
+        "description": "Обезболивающее и жаропонижающее средство",
+        "category": "pain",
+        "image": "images/paracetamol.jpg",
+        "dosage": "500 мг",
+        "quantity": "20 таблеток"
+    },
+    {
+        "id": 2,
+        "name": "Ибупрофен",
+        "price": 1200,
+        "description": "Противовоспалительное и обезболивающее средство",
+        "category": "pain",
+        "image": "images/ibuprofen.jpg",
+        "dosage": "400 мг",
+        "quantity": "24 капсулы"
+    },
+    {
+        "id": 3,
+        "name": "Аспирин",
+        "price": 950,
+        "description": "Жаропонижающее и противовоспалительное средство",
+        "category": "pain",
+        "image": "images/aspirin.jpg",
+        "dosage": "500 мг",
+        "quantity": "10 таблеток"
+    },
+    {
+        "id": 4,
+        "name": "Лоратадин",
+        "price": 650,
+        "description": "Противоаллергическое средство",
+        "category": "allergy",
+        "image": "images/loratadine.jpg",
+        "dosage": "10 мг",
+        "quantity": "30 таблеток"
+    },
+    {
+        "id": 5,
+        "name": "Цитрамон",
+        "price": 480,
+        "description": "Комбинированное обезболивающее средство",
+        "category": "pain",
+        "image": "images/citramon.jpg",
+        "dosage": "240 мг",
+        "quantity": "20 таблеток"
+    },
+    {
+        "id": 6,
+        "name": "Аскорбиновая кислота",
+        "price": 420,
+        "description": "Витамин C для укрепления иммунитета",
+        "category": "vitamins",
+        "image": "images/vitamin_c.jpg",
+        "dosage": "50 мг",
+        "quantity": "100 драже"
+    },
+    {
+        "id": 7,
+        "name": "Ношпа",
+        "price": 1500,
+        "description": "Спазмолитическое средство",
+        "category": "pain",
+        "image": "images/nospa.jpg",
+        "dosage": "40 мг",
+        "quantity": "100 таблеток"
+    },
+    {
+        "id": 8,
+        "name": "Активированный уголь",
+        "price": 280,
+        "description": "Адсорбирующее средство при отравлениях",
+        "category": "digestive",
+        "image": "images/activated_charcoal.jpg",
+        "dosage": "250 мг",
+        "quantity": "50 таблеток"
+    },
+    {
+        "id": 9,
+        "name": "Називин",
+        "price": 850,
+        "description": "Сосудосуживающее средство от насморка",
+        "category": "cold",
+        "image": "images/nazivin.jpg",
+        "dosage": "0.05%",
+        "quantity": "10 мл"
+    },
+    {
+        "id": 10,
+        "name": "Стрепсилс",
+        "price": 980,
+        "description": "Пастилки от боли в горле",
+        "category": "cold",
+        "image": "images/strepsils.jpg",
+        "dosage": "1.2 мг",
+        "quantity": "24 пастилки"
+    },
+    {
+        "id": 11,
+        "name": "Витамин D3",
+        "price": 1450,
+        "description": "Витамин для укрепления костей и иммунитета",
+        "category": "vitamins",
+        "image": "images/vitamin_d3.jpg",
+        "dosage": "2000 МЕ",
+        "quantity": "120 капсул"
+    },
+    {
+        "id": 12,
+        "name": "Мезим",
+        "price": 1650,
+        "description": "Ферментный препарат для улучшения пищеварения",
+        "category": "digestive",
+        "image": "images/mezim.jpg",
+        "dosage": "10000 ЕД",
+        "quantity": "20 таблеток"
+    },
+    {
+        "id": 13,
+        "name": "Нурофен",
+        "price": 1800,
+        "description": "Сильное обезболивающее средство",
+        "category": "pain",
+        "image": "images/nurofen.jpg",
+        "dosage": "200 мг",
+        "quantity": "12 капсул"
+    },
+    {
+        "id": 14,
+        "name": "Кларитин",
+        "price": 2200,
+        "description": "Антигистаминное средство от аллергии",
+        "category": "allergy",
+        "image": "images/claritin.jpg",
+        "dosage": "10 мг",
+        "quantity": "30 таблеток"
+    },
+    {
+        "id": 15,
+        "name": "ТераФлю",
+        "price": 1250,
+        "description": "Комплексное средство от простуды и гриппа",
+        "category": "cold",
+        "image": "images/teraflu.jpg",
+        "dosage": "325 мг",
+        "quantity": "10 пакетиков"
+    },
+    {
+        "id": 16,
+        "name": "Омепразол",
+        "price": 890,
+        "description": "Средство от изжоги и гастрита",
+        "category": "digestive",
+        "image": "images/omeprazole.jpg",
+        "dosage": "20 мг",
+        "quantity": "30 капсул"
+    },
+    {
+        "id": 17,
+        "name": "Мультивитамины",
+        "price": 3200,
+        "description": "Комплекс витаминов и минералов",
+        "category": "vitamins",
+        "image": "images/multivitamin.jpg",
+        "dosage": "Комплекс",
+        "quantity": "60 таблеток"
+    },
+    {
+        "id": 18,
+        "name": "Валидол",
+        "price": 550,
+        "description": "Успокаивающее средство при стрессе",
+        "category": "other",
+        "image": "images/validol.jpg",
+        "dosage": "60 мг",
+        "quantity": "10 таблеток"
+    },
+    {
+        "id": 19,
+        "name": "Корвалол",
+        "price": 720,
+        "description": "Седативное и спазмолитическое средство",
+        "category": "other",
+        "image": "images/corvalol.jpg",
+        "dosage": "25 мл",
+        "quantity": "1 флакон"
+    },
+    {
+        "id": 20,
+        "name": "Йод",
+        "price": 380,
+        "description": "Антисептическое средство",
+        "category": "other",
+        "image": "images/iodine.jpg",
+        "dosage": "5%",
+        "quantity": "25 мл"
+    }
+]

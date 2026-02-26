@@ -1,0 +1,388 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Оформление доставки | MedAI{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/animations.css' %}">
+
+{% endblock %}
+
+{% block content %}
+<!-- Delivery Section -->
+<section class="delivery-section">
+    <div class="container">
+        <h1 class="page-title">Оформление доставки</h1>
+        <div class="delivery-container">
+            <div class="delivery-form slide-up">
+                <h2>Информация о доставке</h2>
+                <form id="delivery-form" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="cart_data" id="cart-data-input">
+                    
+                    <div class="form-group">
+                        <label for="fullname">ФИО</label>
+                        <input type="text" id="fullname" name="fullname" 
+                               value="{% if user.is_authenticated %}{{ user.get_full_name }}{% endif %}" 
+                               required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Телефон</label>
+                        <input type="tel" id="phone" name="phone" required placeholder="+7 (XXX) XXX-XX-XX">
+                    </div>
+
+                    <!-- Блок выбора города и аптеки -->
+                    <div class="form-group">
+                        <label for="city">Город</label>
+                        <select id="city" name="city" required>
+                            <option value="">Выберите город</option>
+                            <option value="almaty">Алматы</option>
+                            <option value="astana">Астана</option>
+                            <option value="shymkent">Шымкент</option>
+                            <option value="karaganda">Караганда</option>
+                            <option value="aktobe">Актобе</option>
+                            <option value="taraz">Тараз</option>
+                            <option value="pavlodar">Павлодар</option>
+                            <option value="ust-kamenogorsk">Усть-Каменогорск</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pharmacy">Аптека</label>
+                        <select id="pharmacy" name="pharmacy" required disabled>
+                            <option value="">Сначала выберите город</option>
+                        </select>
+                        <button type="button" id="show-map-btn" class="btn-outline"
+                            style="margin-top: 10px; width: 100%;">
+                            <i class="fas fa-map-marker-alt"></i> Показать аптеки на карте
+                        </button>
+                    </div>
+
+                    <!-- Блок адреса доставки -->
+                    <div class="form-group">
+                        <label for="address">Адрес доставки</label>
+                        <textarea id="address" name="address" rows="2" placeholder="Улица, дом, квартира" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="delivery-date">Желаемая дата доставки</label>
+                        <input type="date" id="delivery-date" name="delivery-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="delivery-time">Желаемое время доставки</label>
+                        <select id="delivery-time" name="delivery-time" required>
+                            <option value="">Выберите время</option>
+                            <option value="09:00-12:00">09:00 - 12:00</option>
+                            <option value="12:00-15:00">12:00 - 15:00</option>
+                            <option value="15:00-18:00">15:00 - 18:00</option>
+                            <option value="18:00-21:00">18:00 - 21:00</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="payment-method">Способ оплаты</label>
+                        <select id="payment-method" name="payment-method" required>
+                            <option value="">Выберите способ оплаты</option>
+                            <option value="card">Картой онлайн</option>
+                            <option value="cash">Наличными при получении</option>
+                            <option value="card_on_delivery">Картой при получении</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="card-attachment-section" style="display: none;">
+                        <label>Прикрепить карту для оплаты</label>
+                        <button type="button" id="attach-card-btn" class="btn-outline" style="width: 100%;">
+                            <i class="fas fa-credit-card"></i> Прикрепить карту
+                        </button>
+                        <div id="card-info" style="margin-top: 10px; display: none;">
+                            <p><i class="fas fa-check-circle" style="color: green;"></i> Карта прикреплена: <span
+                                    id="card-number">**** **** **** 1234</span></p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="comments">Комментарии к заказу</label>
+                        <textarea id="comments" name="comments" rows="3" placeholder="Дополнительные пожелания..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary">Подтвердить заказ</button>
+                </form>
+            </div>
+            <div class="order-summary slide-up delay-1">
+                <h2>Ваш заказ</h2>
+                <div class="summary-items" id="summary-items">
+                    <!-- Товары из корзины будут добавлены динамически -->
+                    <div class="empty-cart-message">
+                        <i class="fas fa-shopping-cart"></i>
+                        <p>Корзина пуста</p>
+                        <small>Добавьте товары из аптеки</small>
+                    </div>
+                </div>
+                <div class="summary-totals">
+                    <div class="summary-row">
+                        <span>Стоимость товаров:</span>
+                        <span id="items-total">0 ₸</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Доставка:</span>
+                        <span id="delivery-cost">0 ₸</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Итого:</span>
+                        <span id="order-total">0 ₸</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Инициализация страницы доставки
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Страница доставки загружена');
+        
+        // Загрузка корзины из localStorage
+        loadCartItems();
+        
+        // Обработчики событий
+        setupDeliveryPage();
+        
+        // Устанавливаем минимальную дату как сегодня
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('delivery-date').min = today;
+    });
+    
+    function loadCartItems() {
+        const cart = JSON.parse(localStorage.getItem('medai_cart')) || [];
+        const summaryItems = document.getElementById('summary-items');
+        const itemsTotal = document.getElementById('items-total');
+        const orderTotal = document.getElementById('order-total');
+        const deliveryCost = document.getElementById('delivery-cost');
+        
+        if (cart.length === 0) {
+            summaryItems.innerHTML = `
+                <div class="empty-cart-message">
+                    <i class="fas fa-shopping-cart"></i>
+                    <p>Корзина пуста</p>
+                    <small>Добавьте товары из аптеки</small>
+                </div>
+            `;
+            itemsTotal.textContent = '0 ₸';
+            deliveryCost.textContent = '0 ₸';
+            orderTotal.textContent = '0 ₸';
+            return;
+        }
+        
+        let total = 0;
+        let itemsHtml = '';
+        
+        cart.forEach(item => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+            
+            itemsHtml += `
+                <div class="summary-item">
+                    <span>${item.name} × ${item.quantity}</span>
+                    <span>${itemTotal} ₸</span>
+                </div>
+            `;
+        });
+        
+        summaryItems.innerHTML = itemsHtml;
+        itemsTotal.textContent = total + ' ₸';
+        deliveryCost.textContent = '500 ₸';
+        orderTotal.textContent = (total + 500) + ' ₸';
+    }
+    
+    function setupDeliveryPage() {
+        // Выбор города
+        const citySelect = document.getElementById('city');
+        const pharmacySelect = document.getElementById('pharmacy');
+        
+        if (citySelect) {
+            citySelect.addEventListener('change', function() {
+                const city = this.value;
+                pharmacySelect.disabled = !city;
+                
+                if (city) {
+                    // Получаем аптеки для выбранного города
+                    const pharmacies = getPharmaciesByCity(city);
+                    updatePharmacySelect(pharmacies);
+                } else {
+                    pharmacySelect.innerHTML = '<option value="">Сначала выберите город</option>';
+                }
+            });
+        }
+        
+        // Показать карту аптек
+        const showMapBtn = document.getElementById('show-map-btn');
+        if (showMapBtn) {
+            showMapBtn.addEventListener('click', function() {
+                const city = document.getElementById('city').value;
+                if (!city) {
+                    alert('Пожалуйста, сначала выберите город');
+                    return;
+                }
+                openPharmacyMap(city);
+            });
+        }
+        
+        // Способ оплаты
+        const paymentMethodSelect = document.getElementById('payment-method');
+        const cardAttachmentSection = document.getElementById('card-attachment-section');
+        
+        if (paymentMethodSelect && cardAttachmentSection) {
+            paymentMethodSelect.addEventListener('change', function() {
+                if (this.value === 'card') {
+                    cardAttachmentSection.style.display = 'block';
+                } else {
+                    cardAttachmentSection.style.display = 'none';
+                }
+            });
+        }
+        
+        // Прикрепление карты
+        const attachCardBtn = document.getElementById('attach-card-btn');
+        if (attachCardBtn) {
+            attachCardBtn.addEventListener('click', function() {
+                alert('Функция прикрепления карты в разработке');
+            });
+        }
+        
+        // Отправка формы
+        const deliveryForm = document.getElementById('delivery-form');
+        if (deliveryForm) {
+            deliveryForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                processDeliveryForm(this);
+            });
+        }
+    }
+    
+    function getPharmaciesByCity(city) {
+        // Заглушка - в реальном проекте будет AJAX запрос
+        const pharmacies = {
+            'almaty': [
+                {id: 1, name: 'Аптека №1 - ул. Абая, 123', address: 'ул. Абая, 123'},
+                {id: 2, name: 'Аптека №2 - пр. Достык, 45', address: 'пр. Достык, 45'},
+                {id: 3, name: 'Аптека №3 - ул. Сатпаева, 67', address: 'ул. Сатпаева, 67'},
+            ],
+            'astana': [
+                {id: 4, name: 'Аптека №4 - ул. Кенесары, 89', address: 'ул. Кенесары, 89'},
+                {id: 5, name: 'Аптека №5 - пр. Туран, 12', address: 'пр. Туран, 12'},
+            ],
+            'shymkent': [
+                {id: 6, name: 'Аптека №6 - ул. Тауке хана, 34', address: 'ул. Тауке хана, 34'},
+            ]
+        };
+        
+        return pharmacies[city] || [];
+    }
+    
+    function updatePharmacySelect(pharmacies) {
+        const select = document.getElementById('pharmacy');
+        select.innerHTML = '<option value="">Выберите аптеку</option>';
+        
+        pharmacies.forEach(pharmacy => {
+            const option = document.createElement('option');
+            option.value = pharmacy.id;
+            option.textContent = pharmacy.name;
+            select.appendChild(option);
+        });
+    }
+    
+    function openPharmacyMap(city) {
+        alert(`Карта аптек для города ${city} в разработке`);
+    }
+    
+    function processDeliveryForm(form) {
+        const formData = new FormData(form);
+        const cart = JSON.parse(localStorage.getItem('medai_cart')) || [];
+        
+        if (cart.length === 0) {
+            alert('Корзина пуста! Добавьте товары перед оформлением заказа.');
+            return;
+        }
+        
+        // Добавляем данные корзины в formData
+        formData.append('cart_data', JSON.stringify(cart));
+        
+        // Показываем индикатор загрузки
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Оформление...';
+        submitBtn.disabled = true;
+        
+        // Отправляем данные на сервер
+        fetch("{% url 'process_order' %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Показываем уведомление
+                showNotification(data.message);
+                // Очищаем корзину
+                localStorage.removeItem('medai_cart');
+                // Обновляем счетчик корзины
+                updateCartCount();
+                // Через 2 секунды перенаправляем на главную
+                setTimeout(() => {
+                    window.location.href = "{% url 'index' %}";
+                }, 2000);
+            } else {
+                alert(data.message || 'Произошла ошибка при оформлении заказа');
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            alert('Произошла ошибка при оформлении заказа');
+        })
+        .finally(() => {
+            // Восстанавливаем кнопку
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        });
+    }
+    
+    function showNotification(message) {
+        const notification = document.createElement('div');
+        notification.className = 'notification';
+        notification.innerHTML = `
+            <div class="notification-content">
+                <i class="fas fa-check-circle"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease-out forwards';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+    
+    function updateCartCount() {
+        const cart = JSON.parse(localStorage.getItem('medai_cart')) || [];
+        const count = cart.reduce((total, item) => total + item.quantity, 0);
+        const cartCountElement = document.getElementById('cart-count');
+        if (cartCountElement) {
+            cartCountElement.textContent = count;
+        }
+    }
+    
+    function calculateOrderTotal(cart) {
+        let total = 0;
+        cart.forEach(item => {
+            total += item.price * item.quantity;
+        });
+        return total + 500; // + доставка
+    }
+</script>
+{% endblock %}

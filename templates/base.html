@@ -1,0 +1,138 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MedAI{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/animations.css' %}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🩺</text></svg>">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+   <!-- Preloader - Улучшенный -->
+<div id="preloader">
+    <div class="loader">
+        <div class="loader-icon">
+            <i class="fas fa-heartbeat heartbeat"></i>
+        </div>
+        <p>MedAI загружается...</p>
+    </div>
+</div>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-heartbeat"></i>
+                <span>MedAI</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="{% url 'index' %}" {% if request.path == '/' %}class="active"{% endif %}>Главная</a></li>
+                    <li><a href="{% url 'consultation' %}" {% if 'consultation' in request.path %}class="active"{% endif %}>Консультация</a></li>
+                    <li><a href="{% url 'pharmacy' %}" {% if 'pharmacy' in request.path %}class="active"{% endif %}>Аптека</a></li>
+ <li>
+  <a href="{% url 'certificates_list' %}"
+     {% if 'certificates' in request.path %}class="active"{% endif %}>
+     Справки
+  </a>
+</li>
+
+                    <li><a href="{% url 'about' %}" {% if 'about' in request.path %}class="active"{% endif %}>О нас</a></li>
+                </ul>
+            </nav>
+            <div class="header-actions">
+                {% if user.is_authenticated %}
+                <div class="user-profile">
+                    <a href="{% url 'profile' %}" class="btn btn-outline">
+                        <i class="fas fa-user"></i> {{ user.username }}
+                    </a>
+                    <a href="{% url 'logout' %}" class="btn btn-outline">
+                        <i class="fas fa-sign-out-alt"></i> Выйти
+                    </a>
+                </div>
+                {% else %}
+                <div class="auth-buttons">
+                    <a href="{% url 'login' %}" class="btn btn-outline">
+                        <i class="fas fa-sign-in-alt"></i> Войти
+                    </a>
+                    <a href="{% url 'register' %}" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i> Регистрация
+                    </a>
+                </div>
+                {% endif %}
+                
+                {% if 'pharmacy' in request.path %}
+                <div class="cart-icon" id="cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count" id="cart-count">0</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo">
+                        <i class="fas fa-heartbeat"></i>
+                        <span>MedAI</span>
+                    </div>
+                    <p>Инновационный медицинский сервис с использованием искусственного интеллекта для вашего здоровья.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Услуги</h3>
+                    <ul>
+                        <li><a href="{% url 'consultation' %}">Онлайн-консультации</a></li>
+                        <li><a href="{% url 'pharmacy' %}">Доставка лекарств</a></li>
+                        <li><a href="{% url 'documents' %}">Медицинские справки</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Контакты</h3>
+                    <ul>
+                        <li><i class="fas fa-phone"></i> +7 (800) 123-45-67</li>
+                        <li><i class="fas fa-envelope"></i> info@medai.ru</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Казахстан</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; {% now "Y" %} MedAI. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+   
+    {% block extra_js %}{% endblock %}
+    
+    <script>
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const preloader = document.getElementById('preloader');
+                if (preloader) {
+                    preloader.style.opacity = '0';
+                    setTimeout(() => {
+                        preloader.style.display = 'none';
+                    }, 500);
+                }
+            }, 1000);
+        });
+    </script>
+    
+</body>
+</html>

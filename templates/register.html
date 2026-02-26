@@ -1,0 +1,545 @@
+{% extends 'base.html' %}
+
+{% block title %}Регистрация — MedAI{% endblock %}
+
+{% block extra_css %}
+<style>
+:root {
+    --primary-color: #009688;
+    --primary-light: #4db6ac;
+    --primary-dark: #00695c;
+    --primary-gradient: linear-gradient(135deg, #009688 0%, #4db6ac 100%);
+    --primary-glass: rgba(0, 150, 136, 0.1);
+    
+    --secondary-color: #80deea;
+    --white: #ffffff;
+    --light-gray: #f8f9fa;
+    --gray: #adb5bd;
+    --dark-gray: #495057;
+    --text-color: #212529;
+    --text-light: #6c757d;
+    
+    --error-color: #ff5252;
+    --success-color: #4caf50;
+    
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.15);
+    --shadow-hover: 0 12px 40px rgba(0, 150, 136, 0.2);
+    
+    --border-radius-sm: 6px;
+    --border-radius-md: 12px;
+    --border-radius-lg: 16px;
+    --border-radius-xl: 24px;
+    --border-radius-circle: 50%;
+    
+    --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    --glass-bg: rgba(255, 255, 255, 0.95);
+    --glass-border: rgba(255, 255, 255, 0.2);
+}
+
+/* Сброс стилей */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    -webkit-font-smoothing: antialiased;
+}
+
+.register-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #e8f5f4 0%, #d0ece9 100%);
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Декоративные элементы фона */
+.register-wrapper::before {
+    content: '';
+    position: absolute;
+    width: 40vmax;
+    height: 40vmax;
+    background: var(--primary-glass);
+    border-radius: 50%;
+    top: -20vmax;
+    right: -10vmax;
+}
+
+.register-wrapper::after {
+    content: '';
+    position: absolute;
+    width: 30vmax;
+    height: 30vmax;
+    background: rgba(0, 150, 136, 0.05);
+    border-radius: 50%;
+    bottom: -15vmax;
+    left: -5vmax;
+}
+
+.register-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-lg);
+    width: 100%;
+    max-width: 560px;
+    padding: 2.5rem;
+    position: relative;
+    z-index: 1;
+    animation: slideUp 0.6s ease-out;
+    border: 1px solid var(--glass-border);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.register-card h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin-bottom: 0.75rem;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.register-sub {
+    color: var(--text-light);
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--primary-light);
+}
+
+/* Стили для ошибок */
+.error-box {
+    background-color: rgba(255, 82, 82, 0.1);
+    border-left: 4px solid var(--error-color);
+    border-radius: var(--border-radius-md);
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.error-box ul {
+    margin: 0;
+    padding-left: 1.25rem;
+    color: var(--error-color);
+}
+
+.error-box li {
+    margin-bottom: 0.25rem;
+}
+
+.error-box li:last-child {
+    margin-bottom: 0;
+}
+
+.field-error {
+    color: var(--error-color);
+    font-size: 0.875rem;
+    margin-top: 0.375rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.field-error::before {
+    content: '⚠';
+    font-size: 0.875rem;
+}
+
+/* Форма */
+.form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+}
+
+.field label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+    margin-bottom: 0.5rem;
+    transition: color 0.3s ease;
+}
+
+.field input {
+    padding: 0.875rem 1.25rem;
+    border: 2px solid #e0f2f1;
+    border-radius: var(--border-radius-lg);
+    font-size: 1rem;
+    transition: var(--transition-base);
+    background-color: var(--white);
+    color: var(--text-color);
+}
+
+.field input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px var(--primary-glass);
+    transform: translateY(-2px);
+}
+
+.field input::placeholder {
+    color: var(--text-light);
+    opacity: 0.7;
+}
+
+.field input:hover {
+    border-color: var(--primary-light);
+}
+
+/* Чекбокс */
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0.5rem 0;
+}
+
+.checkbox-row input[type="checkbox"] {
+    width: 1.25rem;
+    height: 1.25rem;
+    cursor: pointer;
+    accent-color: var(--primary-color);
+    transition: transform 0.2s ease;
+}
+
+.checkbox-row input[type="checkbox"]:hover {
+    transform: scale(1.1);
+}
+
+.checkbox-row label {
+    font-size: 0.95rem;
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+.checkbox-row a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.checkbox-row a::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background: var(--primary-gradient);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+}
+
+.checkbox-row a:hover {
+    color: var(--primary-dark);
+}
+
+.checkbox-row a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+/* Кнопка регистрации */
+.btn-register {
+    background: var(--primary-gradient);
+    color: var(--white);
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: var(--border-radius-lg);
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-base);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 150, 136, 0.3);
+    margin-top: 1rem;
+    width: 100%;
+}
+
+.btn-register::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-register:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.btn-register:hover::before {
+    left: 100%;
+}
+
+.btn-register:active {
+    transform: translateY(0);
+}
+
+/* Ссылки помощи */
+.help-links {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    text-align: center;
+    border-top: 2px solid #e0f2f1;
+    color: var(--text-light);
+    font-size: 0.95rem;
+}
+
+.help-links a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    margin: 0 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--border-radius-sm);
+    transition: var(--transition-base);
+    position: relative;
+}
+
+.help-links a:not(:last-child)::after {
+    content: '·';
+    color: var(--text-light);
+    margin-left: 0.5rem;
+    font-weight: 400;
+}
+
+.help-links a:hover {
+    background-color: var(--primary-glass);
+    color: var(--primary-dark);
+}
+
+/* Адаптивность */
+@media (max-width: 640px) {
+    .register-wrapper {
+        padding: 1rem;
+    }
+    
+    .register-card {
+        padding: 1.5rem;
+    }
+    
+    .register-card h2 {
+        font-size: 1.8rem;
+    }
+    
+    .field input {
+        padding: 0.75rem 1rem;
+    }
+    
+    .btn-register {
+        padding: 0.875rem 1.5rem;
+    }
+}
+
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Улучшенная доступность */
+@media (prefers-reduced-motion: reduce) {
+    .register-card,
+    .btn-register,
+    .field input,
+    .checkbox-row input[type="checkbox"] {
+        animation: none;
+        transition: none;
+    }
+}
+
+/* Фокус для клавиатурной навигации */
+.field input:focus-visible,
+.btn-register:focus-visible,
+.checkbox-row input[type="checkbox"]:focus-visible {
+    outline: 3px solid var(--primary-light);
+    outline-offset: 2px;
+}
+
+
+/* Декоративное сердечко для фона */
+.heart-decoration {
+    position: absolute;
+    font-size: 12rem;
+    color: var(--primary-glass);
+    bottom: -2rem;
+    right: -2rem;
+    transform: rotate(15deg);
+    z-index: 0;
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: rotate(15deg) translateY(0);
+    }
+    50% {
+        transform: rotate(15deg) translateY(-20px);
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="register-wrapper">
+    <!-- Декоративное сердечко -->
+    <div class="heart-decoration">❤️</div>
+    
+    <div class="register-card" role="region" aria-label="Регистрация">
+        <h2>Создать аккаунт</h2>
+        <p class="register-sub">Быстрая регистрация для доступа к личному кабинету и записи на консультацию</p>
+
+        {# Общие ошибки, совместимо с view, который отдаёт 'errors' список #}
+        {% if errors %}
+            <div class="error-box" role="alert">
+                <ul style="margin:0;padding-left:18px;">
+                {% for e in errors %}
+                    <li>{{ e }}</li>
+                {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        {# non_field_errors из формы (если есть) #}
+        {% if form and form.non_field_errors %}
+            <div class="error-box" role="alert">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="field">
+                    <label for="id_username">
+                        <i class="fas fa-user heartbeat-hover" style="margin-right: 8px;"></i>
+                        Имя пользователя
+                    </label>
+                    <input id="id_username" name="username" type="text" required
+                           value="{% if form %}{{ form.username.value|default_if_none:'' }}{% else %}{{ request.POST.username|default:'' }}{% endif %}"
+                           placeholder="Введите имя пользователя">
+                    {% if form and form.username.errors %}
+                        <div class="field-error">{{ form.username.errors|join:", " }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field">
+                    <label for="id_email">
+                        <i class="fas fa-envelope heartbeat-hover" style="margin-right: 8px;"></i>
+                        Email
+                    </label>
+                    <input id="id_email" name="email" type="email" required
+                           value="{% if form %}{{ form.email.value|default_if_none:'' }}{% else %}{{ request.POST.email|default:'' }}{% endif %}"
+                           placeholder="example@email.com">
+                    {% if form and form.email.errors %}
+                        <div class="field-error">{{ form.email.errors|join:", " }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field">
+                    <label for="id_password1">
+                        <i class="fas fa-lock heartbeat-hover" style="margin-right: 8px;"></i>
+                        Пароль
+                    </label>
+                    <input id="id_password1" name="password1" type="password" required placeholder="Не менее 8 символов">
+                    {% if form and form.password1.errors %}
+                        <div class="field-error">{{ form.password1.errors|join:", " }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field">
+                    <label for="id_password2">
+                        <i class="fas fa-lock heartbeat-hover" style="margin-right: 8px;"></i>
+                        Повторите пароль
+                    </label>
+                    <input id="id_password2" name="password2" type="password" required placeholder="Подтвердите пароль">
+                    {% if form and form.password2.errors %}
+                        <div class="field-error">{{ form.password2.errors|join:", " }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="checkbox-row">
+                    <input id="id_terms" type="checkbox" name="terms" {% if request.POST.terms %}checked{% endif %}>
+                    <label for="id_terms">Согласен(а) с <a href="{% url 'terms' %}">условиями</a> и <a href="{% url 'privacy' %}">политикой конфиденциальности</a></label>
+                </div>
+
+                <button type="submit" class="btn-register">
+                    <i class="fas fa-heart heartbeat-hover" style="margin-right: 8px;"></i>
+                    Зарегистрироваться
+                </button>
+            </div>
+        </form>
+
+        <div class="help-links">
+            <i class="fas fa-heart" style="color: var(--primary-color); opacity: 0.5; margin-right: 8px;"></i>
+            Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a> · <a href="{% url 'index' %}">Назад на главную</a>
+        </div>
+    </div>
+</section>
+
+<script>
+// Добавляем класс loading при отправке формы
+document.querySelector('form').addEventListener('submit', function(e) {
+    const submitBtn = this.querySelector('.btn-register');
+    submitBtn.classList.add('loading');
+    submitBtn.innerHTML = '<i class="fas fa-heart" style="margin-right: 8px;"></i> Регистрация...';
+});
+
+// Анимация появления элементов при загрузке
+document.addEventListener('DOMContentLoaded', function() {
+    const formGroups = document.querySelectorAll('.field');
+    formGroups.forEach((group, index) => {
+        group.style.animation = `slideUp 0.5s ease-out ${index * 0.1}s both`;
+    });
+});
+</script>
+
+<!-- Подключаем Font Awesome для иконок (если еще не подключен в base.html) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock %}
