@@ -1,0 +1,391 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}MedAI - Онлайн-медицинский сервис{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/animations.css' %}">
+
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="fade-in">Ваше здоровье — наш приоритет</h1>
+            <p class="fade-in delay-1">Онлайн-консультации с ИИ-врачом, доставка лекарств и оформление медицинских
+                справок не выходя из дома</p>
+            <div class="hero-actions fade-in delay-2">
+                <a href="{% url 'consultation' %}" class="btn-primary">Начать консультацию</a>
+                <a href="{% url 'pharmacy' %}" class="btn-secondary">Заказать лекарства</a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <img src="/static/images/images.png" alt="Медицинский сервис MedAI - онлайн консультации с ИИ-врачом">
+            
+</div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features">
+    <div class="container">
+        <h2 class="section-title">Наши услуги</h2>
+        <div class="features-grid">
+            <div class="feature-card slide-up">
+                <div class="feature-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3>ИИ-консультации</h3>
+                <p>Получите предварительную диагностику от нашего искусственного интеллекта в любое время суток</p>
+                <a href="{% url 'consultation' %}" class="btn-link">Узнать больше <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="feature-card slide-up delay-1">
+                <div class="feature-icon">
+                    <i class="fas fa-pills"></i>
+                </div>
+                <h3>Доставка лекарств</h3>
+                <p>Заказывайте лекарства онлайн с быстрой доставкой до двери в удобное для вас время</p>
+                <a href="{% url 'pharmacy' %}" class="btn-link">Заказать <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="feature-card slide-up delay-2">
+                <div class="feature-icon">
+                    <i class="fas fa-file-medical"></i>
+                </div>
+                <h3>Медицинские справки</h3>
+                <p>Оформляйте медицинские справки онлайн без необходимости посещения поликлиники</p>
+                <a href="{% url 'documents' %}" class="btn-link">Оформить <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="how-it-works">
+    <div class="container">
+        <h2 class="section-title">Как это работает</h2>
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3>Зарегистрируйтесь</h3>
+                <p>Создайте аккаунт в нашем сервисе</p>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3>Опишите симптомы</h3>
+                <p>Расскажите ИИ-врачу о ваших симптомах</p>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3>Получите рекомендации</h3>
+                <p>ИИ проанализирует симптомы и даст рекомендации</p>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <h3>Закажите лекарства</h3>
+                <p>При необходимости закажите лекарства с доставкой</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Модальное окно входа -->
+<div id="login-modal" class="modal">
+    <div class="modal-content medium">
+        <div class="modal-header">
+            <h2>Вход в систему</h2>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="login-form" method="POST" action="{% url 'login' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="login-identifier">Email или телефон</label>
+                    <input type="text" id="login-identifier" name="username" placeholder="Введите email или телефон" required>
+                </div>
+                <div class="form-group password-group">
+                    <label for="login-password">Пароль</label>
+                    <div class="password-input-container">
+                        <input type="password" id="login-password" name="password" placeholder="Введите пароль" required>
+                        <button type="button" class="password-toggle" id="login-password-toggle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-options">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="remember-me" name="remember_me">
+                        <span class="checkmark"></span>
+                        Запомнить меня
+                    </label>
+                  
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%; margin-bottom: 15px;">
+                    <span class="btn-text">Войти</span>
+                    <div class="btn-loading" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i> Вход...
+                    </div>
+                </button>
+                <p style="text-align: center;">
+                    Нет аккаунта? <a href="#" id="show-register">Зарегистрироваться</a>
+                </p>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно регистрации -->
+<div id="register-modal" class="modal">
+    <div class="modal-content medium">
+        <div class="modal-header">
+            <h2>Регистрация</h2>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="register-form" method="POST" action="{% url 'register' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="register-fullname">ФИО</label>
+                    <input type="text" id="register-fullname" name="full_name" placeholder="Введите ваше полное имя" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-identifier">Email или телефон</label>
+                    <input type="text" id="register-identifier" name="email" placeholder="Введите email или телефон" required>
+                </div>
+                <div class="form-group password-group">
+                    <label for="register-password">Пароль</label>
+                    <div class="password-input-container">
+                        <input type="password" id="register-password" name="password"
+                            placeholder="Придумайте пароль (мин. 6 символов)" required minlength="6">
+                        <button type="button" class="password-toggle" id="register-password-toggle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="agree-terms" name="agree_terms" required>
+                        <span class="checkmark"></span>
+                        Я согласен с <a href="{% url 'terms' %}" class="link">условиями использования</a> и <a href="{% url 'privacy' %}"
+                            class="link">политикой конфиденциальности</a>
+                    </label>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%; margin-bottom: 15px;">
+                    <span class="btn-text">Зарегистрироваться</span>
+                    <div class="btn-loading" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i> Регистрация...
+                    </div>
+                </button>
+                <p style="text-align: center;">
+                    Уже есть аккаунт? <a href="#" id="show-login">Войти</a>
+                </p>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Инициализация главной страницы
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Главная страница загружена');
+        
+        // Настройка анимаций при скролле
+        setupScrollAnimations();
+        
+        // Настройка модальных окон авторизации
+        setupAuthModals();
+    });
+    
+    function setupScrollAnimations() {
+        // Анимации появления элементов при скролле
+        const animatedElements = document.querySelectorAll('.slide-up, .fade-in');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animated');
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+        
+        animatedElements.forEach(el => observer.observe(el));
+    }
+    
+    function setupAuthModals() {
+        // Кнопки открытия модальных окон
+        const loginBtn = document.getElementById('login-btn');
+        const registerBtn = document.getElementById('register-btn');
+        const showRegisterLink = document.getElementById('show-register');
+        const showLoginLink = document.getElementById('show-login');
+        
+        // Убираем старые обработчики если они есть
+        if (loginBtn && loginBtn.onclick) {
+            loginBtn.onclick = null;
+        }
+        if (registerBtn && registerBtn.onclick) {
+            registerBtn.onclick = null;
+        }
+        
+        if (loginBtn) {
+            loginBtn.addEventListener('click', function() {
+                document.getElementById('login-modal').style.display = 'flex';
+            });
+        }
+        
+        if (registerBtn) {
+            registerBtn.addEventListener('click', function() {
+                document.getElementById('register-modal').style.display = 'flex';
+            });
+        }
+        
+        if (showRegisterLink) {
+            showRegisterLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('login-modal').style.display = 'none';
+                document.getElementById('register-modal').style.display = 'flex';
+            });
+        }
+        
+        if (showLoginLink) {
+            showLoginLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('register-modal').style.display = 'none';
+                document.getElementById('login-modal').style.display = 'flex';
+            });
+        }
+        
+        // Закрытие модальных окон
+        document.querySelectorAll('.modal-close').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.closest('.modal').style.display = 'none';
+            });
+        });
+        
+        // Закрытие по клику вне модального окна
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.style.display = 'none';
+                }
+            });
+        });
+        
+        // Переключение видимости пароля
+        document.querySelectorAll('.password-toggle').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const input = this.parentElement.querySelector('input');
+                const icon = this.querySelector('i');
+                
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.className = 'fas fa-eye-slash';
+                } else {
+                    input.type = 'password';
+                    icon.className = 'fas fa-eye';
+                }
+            });
+        });
+        
+        // Обработка отправки формы входа
+        const loginForm = document.getElementById('login-form');
+        if (loginForm) {
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                processLoginForm(this);
+            });
+        }
+        
+        // Обработка отправки формы регистрации
+        const registerForm = document.getElementById('register-form');
+        if (registerForm) {
+            registerForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                processRegisterForm(this);
+            });
+        }
+    }
+    
+    function processLoginForm(form) {
+        const formData = new FormData(form);
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const btnText = submitBtn.querySelector('.btn-text');
+        const btnLoading = submitBtn.querySelector('.btn-loading');
+        
+        // Показываем индикатор загрузки
+        if (btnText && btnLoading) {
+            btnText.style.display = 'none';
+            btnLoading.style.display = 'block';
+        }
+        
+        // Отправка данных на сервер
+        fetch(form.action, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.redirected) {
+                // Успешный вход, перенаправление
+                window.location.href = response.url;
+            } else {
+                return response.json().then(data => {
+                    throw new Error(data.error || 'Ошибка авторизации');
+                });
+            }
+        })
+        .catch(error => {
+            alert(error.message || 'Ошибка при входе. Проверьте данные и попробуйте еще раз.');
+        })
+        .finally(() => {
+            // Восстанавливаем кнопку
+            if (btnText && btnLoading) {
+                btnText.style.display = 'block';
+                btnLoading.style.display = 'none';
+            }
+        });
+    }
+    
+    function processRegisterForm(form) {
+        const formData = new FormData(form);
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const btnText = submitBtn.querySelector('.btn-text');
+        const btnLoading = submitBtn.querySelector('.btn-loading');
+        
+        // Показываем индикатор загрузки
+        if (btnText && btnLoading) {
+            btnText.style.display = 'none';
+            btnLoading.style.display = 'block';
+        }
+        
+        // Отправка данных на сервер
+        fetch(form.action, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.redirected) {
+                // Успешная регистрация, перенаправление
+                window.location.href = response.url;
+            } else {
+                return response.json().then(data => {
+                    throw new Error(data.error || 'Ошибка регистрации');
+                });
+            }
+        })
+        .catch(error => {
+            alert(error.message || 'Ошибка при регистрации. Проверьте данные и попробуйте еще раз.');
+        })
+        .finally(() => {
+            // Восстанавливаем кнопку
+            if (btnText && btnLoading) {
+                btnText.style.display = 'block';
+                btnLoading.style.display = 'none';
+            }
+        });
+    }
+</script>
+{% endblock %}
